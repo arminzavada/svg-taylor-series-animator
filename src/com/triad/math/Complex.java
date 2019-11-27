@@ -1,10 +1,10 @@
 package com.triad.math;
 
-public class Complex {
+public final class Complex {
     private float real;
     private float imaginary;
 
-    public static Complex I = new Complex(0, 1);
+    public static final Complex I = new Complex(0, 1);
 
     public Complex(float real, float imaginary) {
         this.real = real;
