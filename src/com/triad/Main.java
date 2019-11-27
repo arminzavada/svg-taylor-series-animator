@@ -65,10 +65,10 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-class Main {
+public class Main {
     public static void main(String [] args) throws IOException, URISyntaxException {
-        SVGProcessor processor = new SVGProcessor(new URI("/home/armin/test.svg"));
-        for (Complex c : processor.getProcessed(10)) {
+        SVGProcessor processor = new SVGProcessor(new URI("/home/armin/test.svg"), 100, 30);
+        for (Complex c : processor.getFourierSeries()) {
             System.out.println(c.getReal() + "  " +c.getImaginary());
         }
     }

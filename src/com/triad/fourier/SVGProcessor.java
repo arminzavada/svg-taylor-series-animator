@@ -9,34 +9,91 @@ import org.apache.batik.util.XMLResourceDescriptor;
 import org.w3c.dom.svg.SVGDocument;
 import org.w3c.dom.svg.SVGPoint;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Arrays;
+import java.util.List;
 
-public class SVGProcessor {
+public final class SVGProcessor {
     private static SAXSVGDocumentFactory SVGDocumentFactory = new SAXSVGDocumentFactory(XMLResourceDescriptor.getXMLParserClassName());
-    private SVGOMPathElement path;
+    private List<Complex> fourierSeries;
+    private int numberOfSamples;
+    private int seriesLength;
 
-    public SVGProcessor(URI svgUri) throws IOException {
-        UserAgent userAgent = new UserAgentAdapter();
-        DocumentLoader loader = new DocumentLoader( userAgent );
-        BridgeContext bridgeContext = new BridgeContext( userAgent, loader );
-        bridgeContext.setDynamicState( BridgeContext.DYNAMIC );
+    public SVGProcessor(URI svgUri, int numberOfSamples, int seriesLength) throws IOException {
+        this.numberOfSamples = numberOfSamples;
+        this.seriesLength = seriesLength;
 
-        SVGDocument svgDoc = SVGDocumentFactory.createSVGDocument(svgUri.getRawPath());
-        (new GVTBuilder()).build( bridgeContext, svgDoc );
-        path = (SVGOMPathElement)svgDoc.getElementsByTagName("path").item(0);
+        var svgDocument = openSVGDocument(svgUri);
+
+        var path = (SVGOMPathElement)svgDocument.getElementsByTagName("path").item(0);
+        if (path == null) {
+            throw new IOException("The svg file specified does not contain any Path tags");
+        }
+
+        Complex[] complexes = getSamples(path, numberOfSamples);
+        fourierSeries = Arrays.asList(generateSeries(complexes, seriesLength));
     }
 
-    public Complex[] getProcessed(int count) {
-        float unit_length = path.getTotalLength()/count;
-        Complex[] complexes = new Complex[count];
+    public List<Complex> getFourierSeries() { return fourierSeries; }
+    public int getNumberOfSamples() { return numberOfSamples; }
+    public int getSeriesLength() { return seriesLength; }
 
-        for(int i = 0; i < count; i++){
+    private static SVGDocument openSVGDocument(URI svgUri) throws IOException {
+        var userAgent = new UserAgentAdapter();
+        var loader = new DocumentLoader(userAgent);
+        var bridgeContext = new BridgeContext(userAgent, loader);
+        bridgeContext.setDynamicState(BridgeContext.DYNAMIC);
+        var builder = new GVTBuilder();
+
+        var svgDocument = SVGDocumentFactory.createSVGDocument(svgUri.getRawPath());
+
+        builder.build(bridgeContext, svgDocument);
+
+        return svgDocument;
+    }
+
+    private static Complex[] getSamples(SVGOMPathElement path, int numberOfSamples) {
+        float unit_length = path.getTotalLength()/numberOfSamples;
+        Complex[] complexes = new Complex[numberOfSamples];
+
+        for(int i = 0; i < numberOfSamples; i++) {
             SVGPoint tmp_point = SVGPathSupport.getPointAtLength(path, unit_length * i);
             complexes[i] = new Complex(tmp_point.getX(), tmp_point.getY());
         }
 
         return complexes;
+    }
+
+    private static Complex[] generateSeries(Complex[] samples, int n) {
+        Complex[] output = new Complex[n * 2 + 1];
+
+        for (int k = -n; k <= n; k++) {
+            output[k + n] = integrateOver(samples, k);
+        }
+
+        return output;
+    }
+
+    private static Complex integrateOver(Complex[] samples, int k) {
+        Complex result = new Complex(0, 0);
+
+        for (int i = 0; i < samples.length; i++) {
+            float t = (float)i / samples.length;
+            result = Complex.add(
+                    result,
+                    Complex.multiply(
+                            samples[i],
+                            Complex.exp(
+                                    Complex.multiply(
+                                            Complex.I,
+                                            k * 2 * (float)Math.PI * t
+                                    )
+                            )
+                    )
+            );
+        }
+
+        return result;
     }
 }
