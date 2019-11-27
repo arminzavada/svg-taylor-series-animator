@@ -4,19 +4,20 @@ import com.triad.math.Complex;
 import org.apache.batik.anim.dom.SAXSVGDocumentFactory;
 import org.apache.batik.anim.dom.SVGOMPathElement;
 import org.apache.batik.anim.dom.SVGPathSupport;
-import org.apache.batik.bridge.*;
+import org.apache.batik.bridge.BridgeContext;
+import org.apache.batik.bridge.DocumentLoader;
+import org.apache.batik.bridge.GVTBuilder;
+import org.apache.batik.bridge.UserAgentAdapter;
 import org.apache.batik.util.XMLResourceDescriptor;
 import org.w3c.dom.svg.SVGDocument;
 import org.w3c.dom.svg.SVGPoint;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.Arrays;
-import java.util.List;
 
 public final class SVGProcessor {
     private static SAXSVGDocumentFactory SVGDocumentFactory = new SAXSVGDocumentFactory(XMLResourceDescriptor.getXMLParserClassName());
-    private List<Complex> fourierSeries;
+    private Complex[] fourierSeries;
     private int numberOfSamples;
     private int seriesLength;
 
@@ -32,10 +33,10 @@ public final class SVGProcessor {
         }
 
         Complex[] complexes = getSamples(path, numberOfSamples);
-        fourierSeries = Arrays.asList(generateSeries(complexes, seriesLength));
+        fourierSeries = generateSeries(complexes, seriesLength);
     }
 
-    public List<Complex> getFourierSeries() { return fourierSeries; }
+    public Complex getValueAtIndex(int k) { return fourierSeries[k + seriesLength]; }
     public int getNumberOfSamples() { return numberOfSamples; }
     public int getSeriesLength() { return seriesLength; }
 
