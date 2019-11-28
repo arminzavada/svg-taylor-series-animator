@@ -15,16 +15,13 @@ import org.w3c.dom.svg.SVGPoint;
 import java.io.IOException;
 import java.net.URI;
 
-public final class SVGProcessor {
+public class SVGComplexFunction implements ComplexFunction {
     private static SAXSVGDocumentFactory SVGDocumentFactory = new SAXSVGDocumentFactory(XMLResourceDescriptor.getXMLParserClassName());
-    private Complex[] fourierSeries;
     private int numberOfSamples;
-    private int seriesLength;
+    Complex[] complexes;
 
-    public SVGProcessor(URI svgUri, int numberOfSamples, int seriesLength) throws IOException {
+    public SVGComplexFunction(URI svgUri, int numberOfSamples) throws IOException {
         this.numberOfSamples = numberOfSamples;
-        this.seriesLength = seriesLength;
-
         var svgDocument = openSVGDocument(svgUri);
 
         var path = (SVGOMPathElement)svgDocument.getElementsByTagName("path").item(0);
@@ -32,13 +29,18 @@ public final class SVGProcessor {
             throw new IOException("The svg file specified does not contain any Path tags");
         }
 
-        Complex[] complexes = getSamples(path, numberOfSamples);
-        fourierSeries = generateSeries(complexes, seriesLength);
+        complexes = getSamples(path, numberOfSamples);
     }
 
-    public Complex getValueAtIndex(int k) { return fourierSeries[k + seriesLength]; }
-    public int getNumberOfSamples() { return numberOfSamples; }
-    public int getSeriesLength() { return seriesLength; }
+    @Override
+    public int getNumberOfSamples() {
+        return numberOfSamples;
+    }
+
+    @Override
+    public Complex getValueAt(int t) {
+        return complexes[t];
+    }
 
     private static SVGDocument openSVGDocument(URI svgUri) throws IOException {
         var userAgent = new UserAgentAdapter();
@@ -64,37 +66,5 @@ public final class SVGProcessor {
         }
 
         return complexes;
-    }
-
-    private static Complex[] generateSeries(Complex[] samples, int n) {
-        Complex[] output = new Complex[n * 2 + 1];
-
-        for (int k = -n; k <= n; k++) {
-            output[k + n] = integrateOver(samples, k);
-        }
-
-        return output;
-    }
-
-    private static Complex integrateOver(Complex[] samples, int k) {
-        Complex result = new Complex(0, 0);
-
-        for (int i = 0; i < samples.length; i++) {
-            float t = (float)i / samples.length;
-            result = Complex.add(
-                    result,
-                    Complex.multiply(
-                            samples[i],
-                            Complex.exp(
-                                    Complex.multiply(
-                                            Complex.I,
-                                            k * 2 * (float)Math.PI * t
-                                    )
-                            )
-                    )
-            );
-        }
-
-        return result;
     }
 }

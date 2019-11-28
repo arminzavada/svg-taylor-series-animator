@@ -24,20 +24,20 @@ class Rotator {
 public class FourierTemporalPointContainer {
     Point[][] points;
 
-    public FourierTemporalPointContainer(Rotator[] rotators, int timeSteps) {
-        points = new Point[timeSteps][];
+    public FourierTemporalPointContainer(ComplexSeriesProvider complexSeriesProvider) {
+        points = new Point[complexSeriesProvider.getLength()][];
 
-        double deltaTime = 1f / timeSteps;
+        double deltaTime = 1f / complexSeriesProvider.getFunction().getNumberOfSamples();
 
-        for (int i = 0; i < timeSteps; i++) {
-            points[i] = new Point[rotators.length];
+        for (int i = 0; i < complexSeriesProvider.getLength(); i++) {
+            points[i] = new Point[complexSeriesProvider.getFunction().getNumberOfSamples()];
 
             Point point = new Point(0, 0);
 
-            for (int j = 0; j < rotators.length; j++) {
-                point = Point.add(point, rotators[j].calculateTipAtTime(deltaTime * i));
+            for (int t = 0; t < complexSeriesProvider.getFunction().getNumberOfSamples(); t++) {
+//                point = Point.add(point, rotators[t].calculateTipAtTime(deltaTime * i));
 
-                points[i][j] = point;
+                points[i][t] = point;
             }
         }
     }

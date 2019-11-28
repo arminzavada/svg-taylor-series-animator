@@ -58,8 +58,8 @@ package com.triad;
 //    }
 //}
 
-import com.triad.fourier.SVGProcessor;
-import com.triad.math.Complex;
+import com.triad.fourier.ComplexSeriesProviderImplementation;
+import com.triad.fourier.SVGComplexFunction;
 
 import java.io.IOException;
 import java.net.URI;
@@ -67,9 +67,10 @@ import java.net.URISyntaxException;
 
 public class Main {
     public static void main(String [] args) throws IOException, URISyntaxException {
-        SVGProcessor processor = new SVGProcessor(new URI("/home/armin/test.svg"), 100, 30);
-        for (Complex c : processor.getFourierSeries()) {
-            System.out.println(c.getReal() + "  " +c.getImaginary());
+        var function = new SVGComplexFunction(new URI("/home/armin/test.svg"), 100);
+        var seriesProvidier = new ComplexSeriesProviderImplementation(function, 100);
+        for (int k = -100; k < 100; k++) {
+            System.out.println(seriesProvidier.getValueAt(k).getReal() + "  " +seriesProvidier.getValueAt(k).getImaginary());
         }
     }
 }
