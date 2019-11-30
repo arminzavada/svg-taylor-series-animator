@@ -13,6 +13,8 @@ public final class Complex {
 
     public float getReal() { return real; }
     public float getImaginary() { return imaginary; }
+    public float getAbsolute() { return (float)Math.hypot(real, imaginary); }
+    public float getAngle() { return (float)(Math.atan2(imaginary, real) + Math.PI); }
 
     public static Complex add(Complex a, Complex b) {
         return new Complex(a.real + b.real, a.imaginary + b.imaginary);
