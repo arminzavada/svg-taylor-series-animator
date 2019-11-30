@@ -18,7 +18,8 @@ import java.net.URI;
 public class SVGComplexFunction implements ComplexFunction {
     private static SAXSVGDocumentFactory SVGDocumentFactory = new SAXSVGDocumentFactory(XMLResourceDescriptor.getXMLParserClassName());
     private int numberOfSamples;
-    Complex[] complexes;
+    private float svgLength;
+    private Complex[] complexes;
 
     public SVGComplexFunction(URI svgUri, int numberOfSamples) throws IOException {
         this.numberOfSamples = numberOfSamples;
@@ -29,7 +30,14 @@ public class SVGComplexFunction implements ComplexFunction {
             throw new IOException("The svg file specified does not contain any Path tags");
         }
 
+        svgLength = path.getTotalLength();
+
         complexes = getSamples(path, numberOfSamples);
+    }
+
+    @Override
+    public float getFunctionRange() {
+        return svgLength;
     }
 
     @Override

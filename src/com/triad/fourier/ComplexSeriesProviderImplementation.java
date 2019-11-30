@@ -15,13 +15,11 @@ public final class ComplexSeriesProviderImplementation implements ComplexSeriesP
     }
 
     @Override
-    public int getLength() {
-        return 0;
-    }
+    public int getLength() { return length; }
 
     @Override
     public Complex getValueAt(int k) {
-        return fourierSeries[k + function.getNumberOfSamples()];
+        return fourierSeries[k + length];
     }
 
     @Override
@@ -58,6 +56,6 @@ public final class ComplexSeriesProviderImplementation implements ComplexSeriesP
             );
         }
 
-        return result;
+        return Complex.multiply(result, 1f / function.getFunctionRange());
     }
 }
