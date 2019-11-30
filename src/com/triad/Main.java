@@ -61,6 +61,7 @@ package com.triad;
 import com.triad.fourier.ComplexSeriesProviderImplementation;
 import com.triad.fourier.FourierTemporalPointContainer;
 import com.triad.fourier.SVGComplexFunction;
+import com.triad.view.MainWindow;
 
 import java.io.IOException;
 import java.net.URI;
@@ -68,11 +69,7 @@ import java.net.URISyntaxException;
 
 public class Main {
     public static void main(String [] args) throws IOException, URISyntaxException {
-        var function = new SVGComplexFunction(new URI("/home/armin/test.svg"), 100);
-        var seriesProvidier = new ComplexSeriesProviderImplementation(function, 100);
-        var seriesFunction = new FourierTemporalPointContainer(seriesProvidier);
-        for (int k = -100; k < 100; k++) {
-            System.out.println(seriesProvidier.getValueAt(k).getReal() + "  " +seriesProvidier.getValueAt(k).getImaginary());
-        }
+        MainWindow mainWindow = new MainWindow();
+        mainWindow.setVisible(true);
     }
 }
