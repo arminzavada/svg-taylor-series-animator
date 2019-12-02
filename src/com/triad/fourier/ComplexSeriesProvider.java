@@ -6,4 +6,6 @@ public interface ComplexSeriesProvider {
     int getLength();
     Complex getValueAt(int k);
     ComplexFunction getFunction();
+    void setOnUpdateHandler(FourierUpdateHandler updateHandler);
+    void setComplexFunction(ComplexFunction function);
 }

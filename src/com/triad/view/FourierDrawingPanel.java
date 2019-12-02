@@ -5,35 +5,42 @@ import com.triad.math.Complex;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.Line2D;
 import java.util.ArrayList;
 
 public class FourierDrawingPanel extends JPanel {
     private FourierFunction fourierFunction;
     int time = 0;
     ArrayList<Complex> complexes = new ArrayList<>();
+    Timer timer;
 
     public FourierDrawingPanel(FourierFunction fourierFunction) {
         this.fourierFunction = fourierFunction;
+        fourierFunction.setOnUpdateHandler(this::updateComplexFunction);
+    }
+
+    void updateComplexFunction() {
+        if (timer != null) timer.stop();
+        timer = new Timer((int)(3000f / fourierFunction.getMaxTime()), (ActionEvent) -> {
+            time++;
+            time %= fourierFunction.getMaxTime();
+
+            this.repaint();
+        });
+        timer.setRepeats(true);
+        timer.start();
+
+        complexes.clear();
 
         for (int time = 0; time < fourierFunction.getMaxTime(); time++) {
-            Complex c = new Complex(1000, 1000);
+            Complex c = new Complex(0, 0);
 
             for (int k = -fourierFunction.getLength(); k <= fourierFunction.getLength(); k++) {
                 c = Complex.add(c, fourierFunction.getValueAt(k, time));
             }
 
-            complexes.add(c);
+            complexes.add(Complex.multiply(c, -1));
         }
-
-
-        Timer timer = new Timer(10, (ActionEvent) -> {
-            time++;
-            time %= fourierFunction.getMaxTime();
-
-            this. repaint();
-        });
-        timer.setRepeats(true);
-        timer.start();
     }
 
     void drawLine(Graphics2D g, Complex c1, Complex c2) {
@@ -41,23 +48,24 @@ public class FourierDrawingPanel extends JPanel {
     }
 
     private void drawFourier(Graphics2D g) {
-        Complex c1 = new Complex(1000, 1000);
-        Complex c2 = Complex.add(c1, fourierFunction.getValueAt(0, time));
+        Complex c1 = new Complex(0, 0);
+        Complex c2 = Complex.add(c1, Complex.multiply(fourierFunction.getValueAt(0, time), -1));
 
         drawLine(g, c1, c2);
 
+        var line = new Line2D.Float();
+
         for (int i = 1; i <= fourierFunction.getLength(); i++) {
-            c1 = Complex.add(c2, fourierFunction.getValueAt(i, time));
+            c1 = Complex.add(c2, Complex.multiply(fourierFunction.getValueAt(i, time), -1));
             drawLine(g, c2, c1);
-            c2 = Complex.add(c1, fourierFunction.getValueAt(-i, time));
+
+            c2 = Complex.add(c1, Complex.multiply(fourierFunction.getValueAt(-i, time), -1));
             drawLine(g, c1, c2);
         }
 
         for (int i = 1; i < time; i++) {
             drawLine(g, complexes.get(i - 1), complexes.get(i));
         }
-
-        g.drawString(Integer.toString(time), 100, 100);
     }
 
     @Override

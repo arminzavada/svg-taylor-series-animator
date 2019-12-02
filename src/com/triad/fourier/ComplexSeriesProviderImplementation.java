@@ -5,13 +5,11 @@ import com.triad.math.Complex;
 public final class ComplexSeriesProviderImplementation implements ComplexSeriesProvider {
     private Complex[] fourierSeries;
     private int length;
-    private ComplexFunction function;
+    private ComplexFunction function = null;
+    private FourierUpdateHandler updateHandler = () -> {}; // do nothing by default.
 
-    public ComplexSeriesProviderImplementation(ComplexFunction function, int length) {
+    public ComplexSeriesProviderImplementation(int length) {
         this.length = length;
-        this.function = function;
-
-        fourierSeries = generateSeries();
     }
 
     @Override
@@ -27,14 +25,24 @@ public final class ComplexSeriesProviderImplementation implements ComplexSeriesP
         return function;
     }
 
-    private Complex[] generateSeries() {
-        Complex[] output = new Complex[length * 2 + 1];
+    @Override
+    public void setOnUpdateHandler(FourierUpdateHandler updateHandler) {
+        this.updateHandler = updateHandler;
+    }
+
+    @Override
+    public void setComplexFunction(ComplexFunction function) {
+        this.function = function;
+        generateSeries();
+        updateHandler.method();
+    }
+
+    private void generateSeries() {
+        fourierSeries = new Complex[length * 2 + 1];
 
         for (int k = -length; k <= length; k++) {
-            output[k + length] = integrateOver(k);
+            fourierSeries[k + length] = integrateOver(k);
         }
-
-        return output;
     }
 
     private Complex integrateOver(int k) {

@@ -38,25 +38,11 @@ class Rotator {
 }
 
 public class FourierTemporalPointContainer implements FourierFunction {
-    private Complex[][] points;
-    private ComplexSeriesProvider complexSeriesProvider;
+    private Complex[][] points = null;
+    private ComplexSeriesProvider complexSeriesProvider = null;
+    private FourierUpdateHandler updateHandler = () -> {}; // do nothing by default.
 
-    public FourierTemporalPointContainer(ComplexSeriesProvider complexSeriesProvider) {
-        this.complexSeriesProvider = complexSeriesProvider;
-        points = new Complex[complexSeriesProvider.getLength() * 2 + 1][];
-
-        List<Rotator> rotators = Rotator.convertSeries(complexSeriesProvider);
-
-        float deltaTime = 1f / complexSeriesProvider.getFunction().getNumberOfSamples();
-
-        for (int k = 0; k < complexSeriesProvider.getLength() * 2 + 1; k++) {
-            points[k] = new Complex[complexSeriesProvider.getFunction().getNumberOfSamples()];
-
-            for (int t = 0; t < complexSeriesProvider.getFunction().getNumberOfSamples(); t++) {
-                points[k][t] = rotators.get(k).calculateTipAtTime(t * deltaTime);
-            }
-        }
-    }
+    public FourierTemporalPointContainer() { }
 
     @Override
     public Complex getValueAt(int k, int t) {
@@ -71,5 +57,39 @@ public class FourierTemporalPointContainer implements FourierFunction {
     @Override
     public int getLength() {
         return complexSeriesProvider.getLength();
+    }
+
+    @Override
+    public void setOnUpdateHandler(FourierUpdateHandler updateHandler) {
+        this.updateHandler = updateHandler;
+    }
+
+    @Override
+    public void setComplexSeriesProvider(ComplexSeriesProvider complexSeriesProvider) {
+        this.complexSeriesProvider = complexSeriesProvider;
+
+        complexSeriesProvider.setOnUpdateHandler(() -> {
+            generatePoints();
+            updateHandler.method();
+        });
+
+        generatePoints();
+        updateHandler.method();
+    }
+
+    private void generatePoints() {
+        points = new Complex[complexSeriesProvider.getLength() * 2 + 1][];
+
+        List<Rotator> rotators = Rotator.convertSeries(complexSeriesProvider);
+
+        float deltaTime = 1f / complexSeriesProvider.getFunction().getNumberOfSamples();
+
+        for (int k = 0; k < complexSeriesProvider.getLength() * 2 + 1; k++) {
+            points[k] = new Complex[complexSeriesProvider.getFunction().getNumberOfSamples()];
+
+            for (int t = 0; t < complexSeriesProvider.getFunction().getNumberOfSamples(); t++) {
+                points[k][t] = rotators.get(k).calculateTipAtTime(t * deltaTime);
+            }
+        }
     }
 }

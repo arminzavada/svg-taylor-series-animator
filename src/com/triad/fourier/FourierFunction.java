@@ -6,4 +6,6 @@ public interface FourierFunction {
     Complex getValueAt(int k, int t);
     int getMaxTime();
     int getLength();
+    void setOnUpdateHandler(FourierUpdateHandler updateHandler);
+    void setComplexSeriesProvider(ComplexSeriesProvider complexSeriesProvider);
 }
