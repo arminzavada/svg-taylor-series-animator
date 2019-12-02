@@ -51,7 +51,7 @@ public class FourierTemporalPointContainer implements FourierFunction {
 
     @Override
     public int getMaxTime() {
-        return complexSeriesProvider.getFunction().getNumberOfSamples();
+        return complexSeriesProvider.getNumberOfSamples();
     }
 
     @Override
@@ -82,12 +82,12 @@ public class FourierTemporalPointContainer implements FourierFunction {
 
         List<Rotator> rotators = Rotator.convertSeries(complexSeriesProvider);
 
-        float deltaTime = 1f / complexSeriesProvider.getFunction().getNumberOfSamples();
+        float deltaTime = 1f / complexSeriesProvider.getNumberOfSamples();
 
         for (int k = 0; k < complexSeriesProvider.getLength() * 2 + 1; k++) {
-            points[k] = new Complex[complexSeriesProvider.getFunction().getNumberOfSamples()];
+            points[k] = new Complex[complexSeriesProvider.getNumberOfSamples()];
 
-            for (int t = 0; t < complexSeriesProvider.getFunction().getNumberOfSamples(); t++) {
+            for (int t = 0; t < complexSeriesProvider.getNumberOfSamples(); t++) {
                 points[k][t] = rotators.get(k).calculateTipAtTime(t * deltaTime);
             }
         }

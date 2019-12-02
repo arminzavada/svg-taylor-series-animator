@@ -1,6 +1,8 @@
 package com.triad.math;
 
-public final class Complex {
+import java.io.Serializable;
+
+public final class Complex implements Serializable {
     private float real;
     private float imaginary;
 
