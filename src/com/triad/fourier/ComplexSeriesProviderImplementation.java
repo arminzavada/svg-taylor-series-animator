@@ -49,13 +49,13 @@ public final class ComplexSeriesProviderImplementation implements ComplexSeriesP
                             Complex.exp(
                                     Complex.multiply(
                                             Complex.I,
-                                            k * 2 * (float)Math.PI * t
+                                            -k * 2 * (float)Math.PI * t
                                     )
                             )
                     )
             );
         }
 
-        return Complex.multiply(result, 1f / function.getFunctionRange());
+        return Complex.multiply(result, 1f / function.getNumberOfSamples());
     }
 }

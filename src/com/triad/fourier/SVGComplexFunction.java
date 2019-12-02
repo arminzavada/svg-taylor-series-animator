@@ -36,11 +36,6 @@ public class SVGComplexFunction implements ComplexFunction {
     }
 
     @Override
-    public float getFunctionRange() {
-        return svgLength;
-    }
-
-    @Override
     public int getNumberOfSamples() {
         return numberOfSamples;
     }

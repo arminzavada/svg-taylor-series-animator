@@ -23,10 +23,6 @@ class Rotator {
         float x = (float)Math.cos(currentAngle) * radius;
         float y = (float)Math.sin(currentAngle) * radius;
 
-        if (time == 0) {
-            System.out.println("asdf");
-        }
-
         return new Complex(x, y);
     }
 
