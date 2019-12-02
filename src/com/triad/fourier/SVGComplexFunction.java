@@ -18,7 +18,6 @@ import java.net.URI;
 public class SVGComplexFunction implements ComplexFunction {
     private static SAXSVGDocumentFactory SVGDocumentFactory = new SAXSVGDocumentFactory(XMLResourceDescriptor.getXMLParserClassName());
     private int numberOfSamples;
-    private float svgLength;
     private Complex[] complexes;
 
     public SVGComplexFunction(URI svgUri, int numberOfSamples) throws IOException {
@@ -30,9 +29,8 @@ public class SVGComplexFunction implements ComplexFunction {
             throw new IOException("The svg file specified does not contain any Path tags");
         }
 
-        svgLength = path.getTotalLength();
-
-        complexes = getSamples(path, numberOfSamples);
+        generateSamples(path, numberOfSamples);
+        normaliseSamples();
     }
 
     @Override
@@ -59,15 +57,27 @@ public class SVGComplexFunction implements ComplexFunction {
         return svgDocument;
     }
 
-    private static Complex[] getSamples(SVGOMPathElement path, int numberOfSamples) {
+    private void generateSamples(SVGOMPathElement path, int numberOfSamples) {
+        complexes = new Complex[numberOfSamples];
+
         float unit_length = path.getTotalLength()/numberOfSamples;
-        Complex[] complexes = new Complex[numberOfSamples];
 
         for(int i = 0; i < numberOfSamples; i++) {
             SVGPoint tmp_point = SVGPathSupport.getPointAtLength(path, unit_length * i);
             complexes[i] = new Complex(tmp_point.getX(), tmp_point.getY());
         }
-
-        return complexes;
     }
+
+    private void normaliseSamples() {
+        var c = new Complex(0, 0);
+        for (Complex complex : complexes) {
+            c = Complex.add(c, complex);
+        }
+        c = Complex.multiply(c, -1f / numberOfSamples);
+
+        for (int i = 0; i < numberOfSamples; i++) {
+            complexes[i] = Complex.add(complexes[i], c);
+        }
+    }
+
 }

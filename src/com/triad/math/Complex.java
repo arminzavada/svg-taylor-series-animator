@@ -5,6 +5,7 @@ public final class Complex {
     private float imaginary;
 
     public static final Complex I = new Complex(0, 1);
+    public static final Complex Zero = new Complex(0, 0);
 
     public Complex(float real, float imaginary) {
         this.real = real;
