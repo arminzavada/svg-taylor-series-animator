@@ -1,47 +1,89 @@
 package com.triad.view;
 
 import com.triad.fourier.*;
+import org.apache.commons.io.FilenameUtils;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
-import java.io.IOException;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 
 public class MainWindow extends JFrame {
-    JFileChooser chooser = new JFileChooser();
-    ComplexFunction function = new SVGComplexFunction(new URI("/home/armin/test.svg"), 100);
-    ComplexSeriesProvider seriesProvidier = new ComplexSeriesProviderImplementation(10);
-    FourierFunction seriesFunction = new FourierTemporalPointContainer();
+    private final int Width = 600;
+    private final int Heigth = 600;
+    private final int NumberOfSamples = 100;
+    private final int FourierSeriesLength = 20;
+    private final float AnimationDuration = 3000;
+
+    private final JFileChooser chooser = new JFileChooser();
+    private ComplexSeriesProvider seriesProvidier = new ComplexSeriesProviderImplementation(FourierSeriesLength);
+    private final FourierFunction seriesFunction = new FourierTemporalPointContainer();
 
     public MainWindow() throws IOException, URISyntaxException {
-        seriesProvidier.setComplexFunction(function);
+        seriesProvidier.setComplexFunction(new SVGComplexFunction(new URI("/home/armin/test.svg"), NumberOfSamples));
         seriesFunction.setComplexSeriesProvider(seriesProvidier);
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        var filter = new FileNameExtensionFilter("SVG files", "svg");
-        chooser.setFileFilter(filter);
         initMenu();
         var panel = new JPanel();
         panel.setBackground(Color.RED);
-        this.add(new FourierDrawingPanel(seriesFunction, 600, 600, 3000));
-        this.setSize(600, 600);
+        this.add(new FourierDrawingPanel(seriesFunction, Width, Heigth, AnimationDuration));
+        this.setSize(Width, Heigth);
     }
 
     private void openLoadFileDialog() {
+        var filter = new FileNameExtensionFilter("SVG files", "svg", "fsvg");
+        chooser.setFileFilter(filter);
         if(chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-            try {
-                seriesProvidier.setComplexFunction(new SVGComplexFunction(chooser.getSelectedFile().toURI(), 1000));
-            }
-            catch (IOException e) {
-                 JOptionPane.showMessageDialog(this, "SVG file could not be loaded properly.", "File error", JOptionPane.ERROR_MESSAGE);
+            if (FilenameUtils.getExtension(chooser.getSelectedFile().getName()).equals("svg")) {
+                loadSVGFile(chooser.getSelectedFile());
+            } else {
+                loadFSVGFile(chooser.getSelectedFile());
             }
         }
     }
 
-    private void openSaveFileDialog() {
+    private void loadSVGFile(File file) {
+        try {
+            seriesProvidier.setComplexFunction(new SVGComplexFunction(chooser.getSelectedFile().toURI(), NumberOfSamples));
+        } catch (IOException e) {
+            showErrorDialog("SVG file could not be loaded properly.", "File error");
+        }
+    }
 
+    private void loadFSVGFile(File file) {
+        try {
+            var fileIn = new FileInputStream(chooser.getSelectedFile());
+            var in = new ObjectInputStream(fileIn);
+            seriesProvidier = (ComplexSeriesProvider) in.readObject();
+            seriesFunction.setComplexSeriesProvider(seriesProvidier);
+        } catch (ClassNotFoundException e) {
+            showErrorDialog("FSVG file is not in the correct format", "Parsing error");
+        } catch (IOException e) {
+            showErrorDialog("File could not be found!", "File error");
+        }
+    }
+
+    private void showErrorDialog(String message, String title) {
+        JOptionPane.showMessageDialog(this, message, title, JOptionPane.ERROR_MESSAGE);
+    }
+
+    private void openSaveFileDialog() {
+        var filter = new FileNameExtensionFilter("Fourier SVG files", "fsvg");
+        chooser.setFileFilter(filter);
+        if (chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+            try {
+                var fileOut = new FileOutputStream(chooser.getSelectedFile());
+                var out = new ObjectOutputStream(fileOut);
+                out.writeObject(seriesProvidier);
+                out.close();
+                fileOut.close();
+            } catch (IOException i) {
+                JOptionPane.showMessageDialog(this, "FSVG file could not be saved properly.", "File error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }
 
     private void initMenu() {
