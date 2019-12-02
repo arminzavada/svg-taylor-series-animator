@@ -10,19 +10,25 @@ import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+/**
+ * The main window.
+ */
 public class MainWindow extends JFrame {
     private final int Width = 600;
     private final int Heigth = 600;
-    private final int NumberOfSamples = 100;
-    private final int FourierSeriesLength = 20;
+    private final int NumberOfSamples = 10000;
+    private final int FourierSeriesLength = 100;
     private final float AnimationDuration = 3000;
 
     private final JFileChooser chooser = new JFileChooser();
     private ComplexSeriesProvider seriesProvidier = new ComplexSeriesProviderImplementation(FourierSeriesLength);
     private final FourierFunction seriesFunction = new FourierTemporalPointContainer();
 
-    public MainWindow() throws IOException, URISyntaxException {
-        seriesProvidier.setComplexFunction(new SVGComplexFunction(new URI("/home/armin/test.svg"), NumberOfSamples));
+    /**
+     * The default constructor.
+     */
+    public MainWindow() {
+        seriesProvidier.setComplexFunction(ComplexFunction.Empty);
         seriesFunction.setComplexSeriesProvider(seriesProvidier);
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -33,6 +39,9 @@ public class MainWindow extends JFrame {
         this.setSize(Width, Heigth);
     }
 
+    /**
+     * Opens a load file dialog, where the user can select what file to display. It handles SVG and FSVG files.
+     */
     private void openLoadFileDialog() {
         var filter = new FileNameExtensionFilter("SVG files", "svg", "fsvg");
         chooser.setFileFilter(filter);
@@ -45,17 +54,25 @@ public class MainWindow extends JFrame {
         }
     }
 
+    /**
+     * Loads an SVG file, and sets the {@link ComplexSeriesProvider}'s {@link ComplexFunction} to the loaded SVG file.
+     * @param file the file to be loaded.
+     */
     private void loadSVGFile(File file) {
         try {
-            seriesProvidier.setComplexFunction(new SVGComplexFunction(chooser.getSelectedFile().toURI(), NumberOfSamples));
+            seriesProvidier.setComplexFunction(new SVGComplexFunction(file.toURI(), NumberOfSamples));
         } catch (IOException e) {
             showErrorDialog("SVG file could not be loaded properly.", "File error");
         }
     }
 
+    /**
+     * Loads an FSVG file, and sets the {@link FourierFunction}'s {@link ComplexSeriesProvider} to the loaded FSVG file.
+     * @param file the file to be loaded.
+     */
     private void loadFSVGFile(File file) {
         try {
-            var fileIn = new FileInputStream(chooser.getSelectedFile());
+            var fileIn = new FileInputStream(file);
             var in = new ObjectInputStream(fileIn);
             seriesProvidier = (ComplexSeriesProvider) in.readObject();
             seriesFunction.setComplexSeriesProvider(seriesProvidier);
@@ -66,10 +83,18 @@ public class MainWindow extends JFrame {
         }
     }
 
+    /**
+     * Shows an error dialog.
+     * @param message the message of the dialog.
+     * @param title the title of the dialog.
+     */
     private void showErrorDialog(String message, String title) {
         JOptionPane.showMessageDialog(this, message, title, JOptionPane.ERROR_MESSAGE);
     }
 
+    /**
+     * Opens a save file dialog, where the user can chose where to save the currently loaded {@link ComplexSeriesProvider} as a FSVG file
+     */
     private void openSaveFileDialog() {
         var filter = new FileNameExtensionFilter("Fourier SVG files", "fsvg");
         chooser.setFileFilter(filter);
@@ -86,6 +111,9 @@ public class MainWindow extends JFrame {
         }
     }
 
+    /**
+     * Inits the MenuBar
+     */
     private void initMenu() {
         var menuBar = new MenuBar();
         var menu = new Menu("File");

@@ -15,11 +15,22 @@ import org.w3c.dom.svg.SVGPoint;
 import java.io.IOException;
 import java.net.URI;
 
+/**
+ * Represenets a {@link ComplexFunction}, which gets it's values from an SVG file. It's values are computed from the first Path in the SVG file. If there is no Path tag present, then it throws an {@link IOException}. It uses Apache Batik library.
+ * @see SVGPathSupport
+ * @see SAXSVGDocumentFactory
+ */
 public class SVGComplexFunction implements ComplexFunction {
     private static SAXSVGDocumentFactory SVGDocumentFactory = new SAXSVGDocumentFactory(XMLResourceDescriptor.getXMLParserClassName());
     private int numberOfSamples;
     private Complex[] complexes;
 
+    /**
+     * Reads in the given SVG file, and calculates the given amount of values.
+     * @param svgUri the SVG file uri.
+     * @param numberOfSamples the number of samples to calculate.
+     * @throws IOException when the given SVG file does not exist, or it does not contain a well formed SVG file with at least one Path tag.
+     */
     public SVGComplexFunction(URI svgUri, int numberOfSamples) throws IOException {
         this.numberOfSamples = numberOfSamples;
         var svgDocument = openSVGDocument(svgUri);
@@ -33,17 +44,29 @@ public class SVGComplexFunction implements ComplexFunction {
         normaliseSamples();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getNumberOfSamples() {
         return numberOfSamples;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Complex getValueAt(int t) {
         return complexes[t];
     }
 
-    private static SVGDocument openSVGDocument(URI svgUri) throws IOException {
+    /**
+     * Initialises the SVGDocumentv
+     * @param svgUri the SVG file uri.
+     * @throws IOException when the given SVG file does not exist, or it does not contain a well formed SVG file with at least one Path tag.
+     * @return the parsed SVGDocument
+     */
+    private SVGDocument openSVGDocument(URI svgUri) throws IOException {
         var userAgent = new UserAgentAdapter();
         var loader = new DocumentLoader(userAgent);
         var bridgeContext = new BridgeContext(userAgent, loader);
@@ -57,6 +80,11 @@ public class SVGComplexFunction implements ComplexFunction {
         return svgDocument;
     }
 
+    /**
+     * Genrates the samples from the given {@link SVGOMPathElement} path.
+     * @param path the specified {@link SVGOMPathElement}.
+     * @param numberOfSamples the number of samples to calculate.
+     */
     private void generateSamples(SVGOMPathElement path, int numberOfSamples) {
         complexes = new Complex[numberOfSamples];
 
@@ -68,6 +96,9 @@ public class SVGComplexFunction implements ComplexFunction {
         }
     }
 
+    /**
+     * Normalises the samples, so their average be zero.
+     */
     private void normaliseSamples() {
         var c = new Complex(0, 0);
         for (Complex complex : complexes) {

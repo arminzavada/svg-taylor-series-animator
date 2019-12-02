@@ -5,17 +5,30 @@ import com.triad.math.Complex;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Helper class for {@link FourierTemporalPointContainer}. It converts a {@link Complex} number to a radius and angle, and can be used to "rotate" it.
+ */
 class Rotator {
     private float radius;
     private float angle;
     private int turnsPerSecond;
 
+    /**
+     * Calculates the raius and angle, and sets the turnPerSecond.
+     * @param complex the {@link Complex} to convert.
+     * @param turnsPerSecond
+     */
     private Rotator(Complex complex, int turnsPerSecond) {
         this.radius = complex.getAbsolute();
         this.angle = complex.getAngle();
         this.turnsPerSecond = turnsPerSecond;
     }
 
+    /**
+     * Rotates the tip with the specified time. New angle is calculated as: turnsPerSecond * 2 * time * PI
+     * @param time the time.
+     * @return the rotated tip's {@link Complex} representation.
+     */
     Complex calculateTipAtTime(float time) {
         float currentAngle = angle + turnsPerSecond * 2 * time * (float)Math.PI;
         currentAngle %= 2 * Math.PI;
@@ -26,6 +39,11 @@ class Rotator {
         return new Complex(x, y);
     }
 
+    /**
+     * Converts a {@link ComplexSeriesProvider}'s possible values to {@link Rotator}s.
+     * @param complexSeriesProvider the {@link ComplexSeriesProvider}.
+     * @return a list of {@link Rotator}.
+     */
     static List<Rotator> convertSeries(ComplexSeriesProvider complexSeriesProvider) {
         Rotator[] rotators = new Rotator[complexSeriesProvider.getLength() * 2 + 1];
 
@@ -37,33 +55,49 @@ class Rotator {
     }
 }
 
+/**
+ * An implementation of the {@link FourierFunction}. It calculates all the values beforehand, so it becomes a lookup table.
+ */
 public class FourierTemporalPointContainer implements FourierFunction {
     private Complex[][] points = null;
     private ComplexSeriesProvider complexSeriesProvider = null;
     private FourierUpdateHandler updateHandler = () -> {}; // do nothing by default.
 
-    public FourierTemporalPointContainer() { }
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Complex getValueAt(int k, int t) {
         return points[k + complexSeriesProvider.getLength()][t];
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getMaxTime() {
         return complexSeriesProvider.getNumberOfSamples();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getLength() {
         return complexSeriesProvider.getLength();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setOnUpdateHandler(FourierUpdateHandler updateHandler) {
         this.updateHandler = updateHandler;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setComplexSeriesProvider(ComplexSeriesProvider complexSeriesProvider) {
         this.complexSeriesProvider = complexSeriesProvider;
@@ -77,6 +111,9 @@ public class FourierTemporalPointContainer implements FourierFunction {
         updateHandler.method();
     }
 
+    /**
+     * Calculates the {@link Complex} values from the {@link ComplexSeriesProvider}.
+     */
     private void generatePoints() {
         points = new Complex[complexSeriesProvider.getLength() * 2 + 1][];
 

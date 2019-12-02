@@ -67,8 +67,15 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-public class Main {
-    public static void main(String [] args) throws IOException, URISyntaxException {
+/**
+ * The Main class.
+ */
+public final class Main {
+    /**
+     * The entrypoint to the program.
+     * @param args command line input arguments. Not used.
+     */
+    public static void main(String [] args) {
         MainWindow mainWindow = new MainWindow();
         mainWindow.setVisible(true);
     }

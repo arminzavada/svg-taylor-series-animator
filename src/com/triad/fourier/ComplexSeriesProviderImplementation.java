@@ -4,34 +4,56 @@ import com.triad.math.Complex;
 
 import java.io.Serializable;
 
+/**
+ * An implementation of the {@link ComplexSeriesProvider}. It calculates all the values beforehand, so it becomes a lookup table. It is Serialisable.
+ */
 public final class ComplexSeriesProviderImplementation implements ComplexSeriesProvider, Serializable {
     private Complex[] fourierSeries;
     private int length;
     private int numberOfSamples = 0;
     private transient FourierUpdateHandler updateHandler = () -> {}; // do nothing by default.
 
+    /**
+     * Creates a {@link ComplexSeriesProvider} with the specified length.
+     * @param length the specified length.
+     */
     public ComplexSeriesProviderImplementation(int length) {
         this.length = length;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getLength() { return length; }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Complex getValueAt(int k) {
         return fourierSeries[k + length];
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getNumberOfSamples() {
         return numberOfSamples;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setOnUpdateHandler(FourierUpdateHandler updateHandler) {
         this.updateHandler = updateHandler;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setComplexFunction(ComplexFunction function) {
         this.numberOfSamples = function.getNumberOfSamples();
@@ -39,6 +61,10 @@ public final class ComplexSeriesProviderImplementation implements ComplexSeriesP
         updateHandler.method();
     }
 
+    /**
+     * Generates the series from the given {@link ComplexFunction}.
+     * @param function the {@link ComplexFunction} to generate from.
+     */
     private void generateSeries(ComplexFunction function) {
         fourierSeries = new Complex[length * 2 + 1];
 
@@ -47,6 +73,12 @@ public final class ComplexSeriesProviderImplementation implements ComplexSeriesP
         }
     }
 
+    /**
+     * Calculates the Fourier integral coefficient of the specified {@link ComplexFunction} at the spcified index.
+     * @param function the specified {@link ComplexFunction}
+     * @param k the index.
+     * @return the {@link Complex} coefficient at the index.
+     */
     private Complex integrateOver(ComplexFunction function, int k) {
         Complex result = new Complex(0, 0);
 
