@@ -2,12 +2,10 @@ package com.triad.fourier;
 
 import com.triad.math.Complex;
 
-import java.io.Serializable;
-
 /**
  * An implementation of the {@link ComplexSeriesProvider}. It calculates all the values beforehand, so it becomes a lookup table. It is Serialisable.
  */
-public final class ComplexSeriesProviderImplementation implements ComplexSeriesProvider, Serializable {
+public final class ComplexSeriesProviderImplementation implements ComplexSeriesProvider {
     /**
      * The calculated {@link Complex} values.
      */

@@ -2,10 +2,12 @@ package com.triad.fourier;
 
 import com.triad.math.Complex;
 
+import java.io.Serializable;
+
 /**
- * Represents a {@link ComplexFunction}'s Fourier coefficients.
+ * Represents a {@link ComplexFunction}'s Fourier coefficients. It is Serialisable.
  */
-public interface ComplexSeriesProvider {
+public interface ComplexSeriesProvider extends Serializable {
     /**
      * Returns the number of coefficients, where the value is 0..n, and the coefficients are -n..n
      * @return the number of coefficients.
