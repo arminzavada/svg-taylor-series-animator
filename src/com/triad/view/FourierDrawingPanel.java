@@ -11,8 +11,17 @@ import java.util.ArrayList;
  * A JPanel, that draws the specified FourierFunction.
  */
 public class FourierDrawingPanel extends JPanel {
+    /**
+     * The {@link FourierFunction} to be displayed.
+     */
     private final FourierFunction fourierFunction;
+    /**
+     * The added {@link Complex} fourier series values, for each time interval.
+     */
     private final ArrayList<Complex> complexes = new ArrayList<>();
+    /**
+     * The center of the
+     */
     private final Complex center;
     private final float animationDuration;
     private int time = 0;

@@ -21,8 +21,17 @@ import java.net.URI;
  * @see SAXSVGDocumentFactory
  */
 public class SVGComplexFunction implements ComplexFunction {
+    /**
+     * The static {@link SAXSVGDocumentFactory} used to build the {@link SVGDocument}s.
+     */
     private static SAXSVGDocumentFactory SVGDocumentFactory = new SAXSVGDocumentFactory(XMLResourceDescriptor.getXMLParserClassName());
+    /**
+     * How many samples have been calculated.
+     */
     private int numberOfSamples;
+    /**
+     * The calculated {@link Complex} values.
+     */
     private Complex[] complexes;
 
     /**

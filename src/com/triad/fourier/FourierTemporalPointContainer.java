@@ -9,14 +9,23 @@ import java.util.List;
  * Helper class for {@link FourierTemporalPointContainer}. It converts a {@link Complex} number to a radius and angle, and can be used to "rotate" it.
  */
 class Rotator {
+    /**
+     * The radius.
+     */
     private float radius;
+    /**
+     * The angle.
+     */
     private float angle;
+    /**
+     * The rotations to turn, when time = 1.
+     */
     private int turnsPerSecond;
 
     /**
      * Calculates the raius and angle, and sets the turnPerSecond.
      * @param complex the {@link Complex} to convert.
-     * @param turnsPerSecond
+     * @param turnsPerSecond the number of turns to add when time equals 1
      */
     private Rotator(Complex complex, int turnsPerSecond) {
         this.radius = complex.getAbsolute();
@@ -59,8 +68,17 @@ class Rotator {
  * An implementation of the {@link FourierFunction}. It calculates all the values beforehand, so it becomes a lookup table.
  */
 public class FourierTemporalPointContainer implements FourierFunction {
+    /**
+     * The calculated {@link Complex} values.
+     */
     private Complex[][] points = null;
+    /**
+     * The {@link ComplexSeriesProvider} this {@link FourierFunction} uses.
+     */
     private ComplexSeriesProvider complexSeriesProvider = null;
+    /**
+     * The update event handler. Empty method by default.
+     */
     private FourierUpdateHandler updateHandler = () -> {}; // do nothing by default.
 
     /**

@@ -8,9 +8,21 @@ import java.io.Serializable;
  * An implementation of the {@link ComplexSeriesProvider}. It calculates all the values beforehand, so it becomes a lookup table. It is Serialisable.
  */
 public final class ComplexSeriesProviderImplementation implements ComplexSeriesProvider, Serializable {
+    /**
+     * The calculated {@link Complex} values.
+     */
     private Complex[] fourierSeries;
+    /**
+     * The length.
+     */
     private int length;
+    /**
+     * The number of samples of the set {@link ComplexFunction}.
+     */
     private int numberOfSamples = 0;
+    /**
+     * The update event handler. Empty method by default.
+     */
     private transient FourierUpdateHandler updateHandler = () -> {}; // do nothing by default.
 
     /**
