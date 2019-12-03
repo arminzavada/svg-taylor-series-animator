@@ -50,10 +50,23 @@ public final class Complex implements Serializable {
     public float getAngle() { return (float)(Math.atan2(imaginary, real) + Math.PI); }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) return true;
+        if (!(o instanceof Complex)) return false;
+
+        Complex c = (Complex)o;
+
+        return Double.compare(real, c.real) == 0 && Double.compare(imaginary, c.imaginary) == 0;
+    }
+
+    /**
      * Adds two {@link Complex} numbers.
      * @param a the first number.
      * @param b the second number.
-     * @return {@param a} + {@param b}
+     * @return <code>a + b</code>
      */
     public static Complex add(Complex a, Complex b) {
         return new Complex(a.real + b.real, a.imaginary + b.imaginary);
@@ -63,7 +76,7 @@ public final class Complex implements Serializable {
      * Adds a {@link Complex} number to a normal number.
      * @param a the {@link Complex} number.
      * @param b the ordinary number.
-     * @return {@param a} + {@param b}
+     * @return <code>a + b</code>
      */
     public static Complex add(Complex a, float b) {
         return new Complex(a.real + b, a.imaginary);
@@ -73,7 +86,7 @@ public final class Complex implements Serializable {
      * Multiplies two {@link Complex} numbers.
      * @param a the first number.
      * @param b the second number.
-     * @return {@param a} * {@param b}
+     * @return <code>a * b</code>
      */
     public static Complex multiply(Complex a, Complex b) {
         return new Complex(a.real * b.real + a.imaginary * b.imaginary, a.real * b.imaginary + a.imaginary * b.real);
@@ -83,7 +96,7 @@ public final class Complex implements Serializable {
      * Multiplies a {@link Complex} number with a normal number.
      * @param a the {@link Complex} number.
      * @param b the ordinary number.
-     * @return {@param a} * {@param b}
+     * @return <code>a * b</code>
      */
     public static Complex multiply(Complex a, float b) {
         return new Complex(a.real * b, a.imaginary * b);
